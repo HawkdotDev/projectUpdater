@@ -7,21 +7,30 @@ from functools import partial
 from utils.git_pull import git_pull_in_subfolders
 
 path_presets = {}  # dictionary to store path presets
-
-# def browse_button(entry_path):
-#     path = filedialog.askdirectory()
-#     entry_path.delete(0, tk.END)
-#     entry_path.insert(0, path)
+selected_folder_path = ""
 
 def start_git_pull(root_path, status_label, progress_bar):
     def update_status(status):
         status_label.config(text=status)
         progress_bar.stop()
 
-    try:
-        git_pull_in_subfolders(root_path, update_status)
-    except Exception as e:
-        status_label.config(text=f"Error: {str(e)}")
+    if(selected_folder_path):
+        try:
+            git_pull_in_subfolders(selected_folder_path, update_status)
+        except Exception as e:
+            status_label.config(text=f"Error: {str(e)}")
+    else:
+        try:
+            git_pull_in_subfolders(root_path, update_status)
+        except Exception as e:
+            status_label.config(text=f"Error: {str(e)}")
+
+def browse_file():
+    global selected_folder_path
+    folder_path = filedialog.askdirectory()
+    if folder_path:
+        selected_folder_path = folder_path
+
 
 def save_preset(entry_path):
     root_path = entry_path.get()
@@ -87,12 +96,11 @@ def run_git_pull_gui():
     entry_path = tk.Entry(frame)
     entry_path.grid(row=0, column=1, padx=10, pady=10)
 
-    # browse_button_func = partial(browse_button, entry_path)
-    # browse_button = tk.Button(frame, text="Browse", command=browse_button_func)
-    # browse_button.grid(row=0, column=2, padx=10, pady=10)
-
     start_button = tk.Button(frame, text="Start Git Pull", command=lambda: start_git_pull(entry_path.get(), status_label, progress_bar))
     start_button.grid(row=1, column=1, padx=10, pady=10)
+
+    browse_button = tk.Button(frame, text="Browse", command=browse_file)
+    browse_button.grid(row=0, column=2, padx=10, pady=10)   
 
     save_preset_func = partial(save_preset, entry_path)
     save_preset_button = tk.Button(frame, text="Save Preset", command=save_preset_func)
