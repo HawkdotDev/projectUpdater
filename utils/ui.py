@@ -31,7 +31,6 @@ def browse_file():
     if folder_path:
         selected_folder_path = folder_path
 
-
 def save_preset(entry_path):
     root_path = entry_path.get()
     preset_name = simpledialog.askstring("Save Preset", "Enter a name for the preset:")
